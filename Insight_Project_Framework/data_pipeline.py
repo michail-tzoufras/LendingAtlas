@@ -227,14 +227,14 @@ if __name__ == '__main__':
                         default='/Users/mtzoufras/Desktop/Insight/Insight_Project_Data/BigML_Dataset.csv',
                         help='dataset path')
     parser.add_argument('--solver', action='store', 
-                        default='Logistic Regression',
+                        default='All',
                         help="Select solver from: (1) 'Logistic Regression' \
                                                   (2) 'Random Forest' \
                                                   (3) 'Embeddings' \
                                                   (4) 'All' ")
     args = parser.parse_args()
 
-    datapath = '/Users/mtzoufras/Desktop/Insight/Insight_Project_Code/d0.0_Make_CSVs/split3/'
+    datapath = os.getcwd()+'/../data/preprocessed/'
     dataname = 'BigML_Split_%s.csv'
     #split(open(args.data, 'r'), datapath, dataname)
 
