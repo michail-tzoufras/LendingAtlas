@@ -23,7 +23,6 @@ from sklearn.ensemble import RandomForestClassifier
 #------------------------------------------------------------------
 
 import visualization as Vis
-import embeddings_DL as Emb
 #------------------------------------------------------------------
 
 def new_csv_writer( path, name, filenumber, headers, delimiter):
@@ -128,6 +127,7 @@ if __name__ == '__main__':
                                 [df_raw.Status.isin(valid_status)]).copy()
 
     Vis.data_exploration(df_clean)
+    Vis.country_vs_status(df_clean)
     categorical_columns = ['Country','Sector','Activity']
     ordinal_columns = ['Loan Amount','Funded Time']
 
@@ -171,6 +171,7 @@ if __name__ == '__main__':
     if ((args.solver == 'Embeddings') or (args.solver == 'All')):
                                       # remove the above comment later, when embeddings are working 
                                       # with the same metrics as the othe models
+        import embeddings_DL as Emb
         
         # Find the vocabulary sizes for the categorical features
         vocabulary_sizes = [df_clean[c].nunique() for c in categorical_columns]

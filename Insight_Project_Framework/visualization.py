@@ -16,6 +16,59 @@ from sklearn import metrics
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
+def country_vs_status(df):
+    Country_names = []
+    Number_Defaults = []
+    Number_Paid = []
+    for i,r in enumerate(df['Country'].unique()):
+        Country_names.append(r)
+        ftmp = df[df['Country']==r]['Status']
+        if ((ftmp.value_counts()).shape[0] < 2):
+            defaults = ftmp[ftmp == 'defaulted'].value_counts()
+            if (defaults.shape[0] > 0):
+                Number_Defaults.append(np.sum(ftmp.value_counts()))
+                Number_Paid.append(0)
+            else:
+                Number_Defaults.append(0)
+                Number_Paid.append(np.sum(ftmp.value_counts()))
+        else:
+            defaults = ftmp[ftmp == 'defaulted'].value_counts()
+            Number_Defaults.append(defaults[0])
+            Number_Paid.append(np.sum(ftmp.value_counts())-defaults[0])
+
+    Percentage = np.array([d*100.0/float(p+d) for p,d in zip(Number_Paid,Number_Defaults)])
+
+    indices = np.argsort(np.array(Percentage))
+    Countries = np.array(Country_names)[indices]
+    Defaults = np.array(Number_Defaults)[indices]
+    Paid = np.array(Number_Paid)[indices]
+
+    max_digits = int(np.log10(np.max(Paid+Defaults)))
+    yticks = [1]
+    for i in range(max_digits+1):
+        yticks.append(yticks[i]*10)
+    yticklabels=[str(ytick) for ytick in yticks]
+
+    fig = plt.figure(figsize=(20, 9))
+    ax = fig.add_subplot(1, 1, 1)
+    plt.title('Countries listed in order of default rate',fontsize = 16)
+    plt.ylabel('Number of Loans',fontsize = 16)
+    plt.bar(range(Countries.shape[0]), Defaults, color='red',label = 'defaulted')
+    plt.bar(range(Countries.shape[0]), Paid,  bottom=Defaults, color='black',label = 'paid')
+    plt.xticks(range(Countries.shape[0]), Countries, rotation='vertical',fontsize = 12)
+    for ytick in yticks[:-1]:
+        plt.axhline(y=ytick, color='white', linestyle='dotted')
+
+    plt.subplots_adjust(bottom=0.35) # or whatever
+
+    ax.set_ylim([0.8,yticks[-1]])
+    ax.set_yscale('log')
+    ax.set_xlim([-0.5,Countries.shape[0]+0.5])
+    ax.set_yticks(yticks)
+    ax.set_yticklabels(yticklabels,fontsize=16)
+    plt.legend(fontsize = 16)
+    plt.savefig('Countries_vs_status.png')
+
 
 def data_exploration(df):
     """Preliminary data exploration function, plots things..."""
@@ -36,13 +89,11 @@ def data_exploration(df):
     plt.tight_layout(pad=1.0)
     plt.savefig('Status_Freq_per_Sector.png')
 
-    table=pd.crosstab(df['Country'],df['Status'])
-    table.div(table.sum(1).astype(float), axis=0).plot(kind='bar', stacked=True, figsize=(15, 6),cmap='Set1',legend=None)
-    #pd.crosstab(df_r.Country,df_r.Status).plot(kind='bar', stacked=True,figsize=(15, 6),cmap='Set1')
-    #plt.xlabel('Country')
-    plt.ylabel('Status Probability')
-    plt.subplots_adjust(bottom=0.45) # or whatever
-    plt.savefig('Status_Probability_Per_Country.png')
+    #table=pd.crosstab(df['Country'],df['Status'])
+    #table.div(table.sum(1).astype(float), axis=0).plot(kind='bar', stacked=True, figsize=(15, 6),cmap='Set1',legend=None)
+    #plt.ylabel('Status Probability')
+    #plt.subplots_adjust(bottom=0.45) # or whatever
+    #plt.savefig('Status_Probability_Per_Country.png')
 
 
 
