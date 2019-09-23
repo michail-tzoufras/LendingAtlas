@@ -58,6 +58,7 @@ def split(filehandler, output_path, output_name_template, row_limit=100000, deli
         i += 1
 
 #----------------------#----------------------#----------------------
+# DATA PROCESSING
 
 def normalize_column(df_column, center_at_zero = False):
     """Converts an unnormalized dataframe column to a normalized 
@@ -92,6 +93,37 @@ def dataframe_to_numpy(df,categorical_columns,ordinal_columns):
 
     return np.transpose(X)
 
+def combine_rare(df,column, Limit = 200):
+    """Combine rare categorical data to Rare_"""
+    for r in df[column].unique():
+        if (np.sum(df[df[column] ==r]['Status'].value_counts()) < Limit):
+            df[column].replace(r,'Rare_'+column,inplace=True)
+
+def oversample_minority(df, ratio = 1.0):
+    """Oversamples the minority class to reach a ratio by default
+    equal to 1 between the majority and mionority classes"""
+    count_class_0, count_class_1 = df['Status'].value_counts()
+    df_class_0 = df[df['Status'] == 'paid']
+    df_class_1 = df[df['Status'] == 'defaulted']
+    #print(count_class_0)
+    #print(count_class_1)
+    df_class_1_over = df_class_1.sample(int(ratio*count_class_0),replace=True)
+    df_train_over = pd.concat([df_class_0, df_class_1_over], axis=0)
+    #print(df_train_over['Status'].value_counts())
+    return df_train_over
+
+def undersample_majority(df, ratio = 1.0):
+    """Undersamples the majority class to reach a ratio by default
+    equal to 1 between the majority and minority classes"""
+    count_class_0, count_class_1 = df['Status'].value_counts()
+    df_class_0 = df[df['Status'] == 'paid']
+    df_class_1 = df[df['Status'] == 'defaulted']
+    print(count_class_0)
+    print(count_class_1)
+    df_class_0_under = df_class_0.sample(int(ratio*count_class_1))
+    df_train_under = pd.concat([df_class_0_under, df_class_1], axis=0)
+    #print(df_train_under['Status'].value_counts)
+    return df_train_under
 
 
 #-----------------------------------
@@ -126,26 +158,39 @@ if __name__ == '__main__':
     df_clean['Funded Time'] = ((df_raw['Funded Date.year']+0.0833*df_raw['Funded Date.month'])
                                 [df_raw.Status.isin(valid_status)]).copy()
 
-    Vis.data_exploration(df_clean)
-    Vis.country_vs_status(df_clean)
     categorical_columns = ['Country','Sector','Activity']
     ordinal_columns = ['Loan Amount','Funded Time']
+
+    for c in categorical_columns:
+        combine_rare(df_clean,c)
+
+    Vis.data_exploration(df_clean)
+    Vis.country_vs_status(df_clean)
+
+    # Split data set into training and test sets
+    df_train_raw, df_test = train_test_split(df_clean, test_size=0.3 )
+
+    # Undersample the majority or oversample the minority
+    df_train = undersample_majority(df_train_raw,2)
+    #df_train = oversample_minority(df_train_raw)
+
+    # Convert train dataframe to train input mumpy array and train labels
+    X_train  = dataframe_to_numpy(df_train,categorical_columns,ordinal_columns)
+    y_train = np.array((pd.get_dummies(df_train['Status'], columns=['Status'])['defaulted']).tolist())
+
+    # Convert test dataframe to test input numpy array and test labels
+    X_test  = dataframe_to_numpy(df_test,categorical_columns,ordinal_columns)
+    y_test = np.array((pd.get_dummies(df_test['Status'], columns=['Status'])['defaulted']).tolist())
 
     y_pred, y_prob, model_titles = [], [], []
     if ((args.solver == 'Logistic Regression') or \
         (args.solver == 'Random Forest') or \
         (args.solver == 'All')):
         
-        X  = dataframe_to_numpy(df_clean,categorical_columns,ordinal_columns)
-        y = np.array((pd.get_dummies(df_clean['Status'], columns=['Status'])['defaulted']).tolist())
 
-
-        # Split data set into training and test sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-    
         if ((args.solver == 'Logistic Regression') or (args.solver == 'All')):
             # Import module for fitting
-            logmodel = LogisticRegression(solver='lbfgs',class_weight= {0:.1, 1:.9},
+            logmodel = LogisticRegression(solver='lbfgs',#class_weight= {0:.1, 1:.9},
                               penalty='l2',C=10.0, max_iter=500)
 
             # Fit the model using the training data
@@ -157,7 +202,8 @@ if __name__ == '__main__':
 
         if ((args.solver == 'Random Forest') or (args.solver == 'All')):
             # Import module for fitting
-            rfmodel = RandomForestClassifier(n_estimators=25,class_weight= {0:.1, 1:.9},max_depth=10)
+            rfmodel = RandomForestClassifier(n_estimators=25,#class_weight= {0:.1, 1:.9},
+                max_depth=10)
 
 
             # Fit the model using the training data
@@ -174,22 +220,22 @@ if __name__ == '__main__':
         import embeddings_DL as Emb
         
         # Find the vocabulary sizes for the categorical features
-        vocabulary_sizes = [df_clean[c].nunique() for c in categorical_columns]
+        vocabulary_sizes = [df_train[c].nunique() for c in categorical_columns]
 
         # Maximum sentence length
         max_length=2
 
         embeddings_model = Emb.model_with_embeddings(vocabulary_sizes, max_length, len(ordinal_columns))
-        categorical_data = Emb.data_preprocessing(df_clean, categorical_columns, vocabulary_sizes, max_length)
+        categorical_data = Emb.data_preprocessing(df_train, categorical_columns, vocabulary_sizes, max_length)
 
         # normalize the orindal features
-        ordinal_data = [ (normalize_column(df_clean[c])).reshape(-1,1) for c in ordinal_columns] 
+        ordinal_data = [ (normalize_column(df_train[c])).reshape(-1,1) for c in ordinal_columns] 
 
         input_data = categorical_data+ordinal_data
-        labels = np.array((pd.get_dummies(df_clean['Status'], columns=['Status'])['paid']).tolist())
+        labels = np.array((pd.get_dummies(df_train['Status'], columns=['Status'])['paid']).tolist())
 
         acc = embeddings_model(input_data,labels)
 
-        print('Accuracy: %f' % (acc*100))
+        print('Training Accuracy: %f' % (acc*100))
 
     Vis.report_model_performance(y_test,y_pred,y_prob,model_titles)
