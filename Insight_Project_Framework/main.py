@@ -1,3 +1,6 @@
+# Developed by: Michail Tzoufras 
+# Date updated: 9/23/2019
+
 import os
 import csv
 import argparse
@@ -16,13 +19,14 @@ import seaborn as sns
 sns.set(style="white")
 #------------------------------------------------------------------
 
-from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 #------------------------------------------------------------------
 
 import visualization as Vis
+import data_processing as Process
+
 #------------------------------------------------------------------
 
 def new_csv_writer( path, name, filenumber, headers, delimiter):
@@ -57,74 +61,18 @@ def split(filehandler, output_path, output_name_template, row_limit=100000, deli
         output_writer.writerow(row)
         i += 1
 
-#----------------------#----------------------#----------------------
-# DATA PROCESSING
 
-def normalize_column(df_column, center_at_zero = False):
-    """Converts an unnormalized dataframe column to a normalized 
-    1D numpy array
-    Default: normalizes between [0,1]
-    (center_at_zero == True): normalizes between [-1,1] """
 
-    normalized_array = np.array(df_column,dtype = 'float64')
-    amax, amin = np.max(normalized_array), np.min(normalized_array)
-    normalized_array -= amin
-    if center_at_zero:
-        normalized_array *= 2.0/(amax-amin)
-        normalized_array -= 1.0
+def str2bool(v):
+    """Allows me to use default bools in argparse"""
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
     else:
-        normalized_array *= 1.0/(amax-amin)
-    return normalized_array
-
-
-def dataframe_to_numpy(df,categorical_columns,ordinal_columns):
-    """Converts data in dataframe to numpy array that includes:
-    1) one-hot encoded categorical columnhs
-    2) normalized ordinal columns"""
-
-    le = preprocessing.LabelEncoder()
-    Xtmp = (df[categorical_columns].copy()).apply(lambda col: le.fit_transform(col))
-
-    ohe = preprocessing.OneHotEncoder(handle_unknown='ignore',sparse=False )
-    X = np.transpose(ohe.fit_transform(Xtmp))
-
-    for c in ordinal_columns:        
-        X = np.vstack([X, normalize_column(df[c])])
-
-    return np.transpose(X)
-
-def combine_rare(df,column, Limit = 200):
-    """Combine rare categorical data to Rare_"""
-    for r in df[column].unique():
-        if (np.sum(df[df[column] ==r]['Status'].value_counts()) < Limit):
-            df[column].replace(r,'Rare_'+column,inplace=True)
-
-def oversample_minority(df, ratio = 1.0):
-    """Oversamples the minority class to reach a ratio by default
-    equal to 1 between the majority and mionority classes"""
-    count_class_0, count_class_1 = df['Status'].value_counts()
-    df_class_0 = df[df['Status'] == 'paid']
-    df_class_1 = df[df['Status'] == 'defaulted']
-    #print(count_class_0)
-    #print(count_class_1)
-    df_class_1_over = df_class_1.sample(int(ratio*count_class_0),replace=True)
-    df_train_over = pd.concat([df_class_0, df_class_1_over], axis=0)
-    #print(df_train_over['Status'].value_counts())
-    return df_train_over
-
-def undersample_majority(df, ratio = 1.0):
-    """Undersamples the majority class to reach a ratio by default
-    equal to 1 between the majority and minority classes"""
-    count_class_0, count_class_1 = df['Status'].value_counts()
-    df_class_0 = df[df['Status'] == 'paid']
-    df_class_1 = df[df['Status'] == 'defaulted']
-    print(count_class_0)
-    print(count_class_1)
-    df_class_0_under = df_class_0.sample(int(ratio*count_class_1))
-    df_train_under = pd.concat([df_class_0_under, df_class_1], axis=0)
-    #print(df_train_under['Status'].value_counts)
-    return df_train_under
-
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 #-----------------------------------
 #------------MAIN-------------------
@@ -137,10 +85,23 @@ if __name__ == '__main__':
                         help='dataset path')
     parser.add_argument('--solver', action='store', 
                         default='All',
-                        help="Select solver from: (1) 'Logistic Regression' \
+                        help="Select solver from: (1) 'All' \
                                                   (2) 'Random Forest' \
                                                   (3) 'Embeddings' \
-                                                  (4) 'All' ")
+                                                  (4) 'Logistic Regression' ")
+    parser.add_argument('--sample', action='store',
+                        default='undersample',
+                        help="For imbalanced classes: (1) 'undersample' \
+                                                      (2) 'oversample' \
+                                                      (3) 'None' ")
+    parser.add_argument('--merge_rare', type=str2bool, nargs='?',
+                        const=True, default=False,
+                        help="Merge rare values")
+    parser.add_argument('--explore_data', type=str2bool, nargs='?',
+                        const=True, default=False,
+                        help="Generate data exploration plots")
+
+
     args = parser.parse_args()
 
     #datapath = '/Users/mtzoufras/Desktop/Insight/Insight_Project_Code/d0.0_Make_CSVs/split3/'
@@ -161,26 +122,46 @@ if __name__ == '__main__':
     categorical_columns = ['Country','Sector','Activity']
     ordinal_columns = ['Loan Amount','Funded Time']
 
-    for c in categorical_columns:
-        combine_rare(df_clean,c)
+    if args.merge_rare:
+        for c in categorical_columns:
+            Process.combine_rare(df_clean,c)
 
-    Vis.data_exploration(df_clean)
-    Vis.country_vs_status(df_clean)
+    if args.explore_data:
+        Vis.data_exploration(df_clean)
+        Vis.country_vs_status(df_clean)
 
     # Split data set into training and test sets
     df_train_raw, df_test = train_test_split(df_clean, test_size=0.3 )
 
-    # Undersample the majority or oversample the minority
-    df_train = undersample_majority(df_train_raw,2)
-    #df_train = oversample_minority(df_train_raw)
+    # Undersample the majority (default) or ...
+    if (args.sample == 'undersample'):
+        df_train = Process.undersample_majority(df_train_raw,2)
+    # ... oversample the minority or ...
+    elif (args.sample == 'oversample'):
+        df_train = Process.oversample_minority(df_train_raw,0.5)
+    # ... work with imbalance as is
+    else:
+        df_train = df_train_raw
 
-    # Convert train dataframe to train input mumpy array and train labels
-    X_train  = dataframe_to_numpy(df_train,categorical_columns,ordinal_columns)
-    y_train = np.array((pd.get_dummies(df_train['Status'], columns=['Status'])['defaulted']).tolist())
+    # Concatenate the train and test dataframes
+    # to make sure the arrays have the same number
+    # of features when they are split.
+    train_length = len(df_train)
+    df_concatenated = pd.concat([df_train,df_test])
 
-    # Convert test dataframe to test input numpy array and test labels
-    X_test  = dataframe_to_numpy(df_test,categorical_columns,ordinal_columns)
-    y_test = np.array((pd.get_dummies(df_test['Status'], columns=['Status'])['defaulted']).tolist())
+    #print("Training set size = " + str(train_length))
+    #print("Test set size = " + str(len(df_concatenated)-train_length))
+    #print("Total set size = " + str(len(df_concatenated)))
+
+
+    # Convert dataframe to numpy array and labels
+    X_concatenated  = Process.dataframe_to_numpy(df_concatenated,categorical_columns,ordinal_columns)
+    y_concatenated = np.array((pd.get_dummies(df_concatenated['Status'], columns=['Status'])['defaulted']).tolist())
+
+    # Split the train from the test arrays
+    X_train, X_test = X_concatenated[:train_length, :], X_concatenated[train_length:, :]
+    y_train, y_test = y_concatenated[:train_length   ], y_concatenated[train_length:   ]
+
 
     y_pred, y_prob, model_titles = [], [], []
     if ((args.solver == 'Logistic Regression') or \
@@ -205,7 +186,6 @@ if __name__ == '__main__':
             rfmodel = RandomForestClassifier(n_estimators=25,#class_weight= {0:.1, 1:.9},
                 max_depth=10)
 
-
             # Fit the model using the training data
             rfmodel.fit(X_train,y_train)
 
@@ -215,27 +195,38 @@ if __name__ == '__main__':
 
 
     if ((args.solver == 'Embeddings') or (args.solver == 'All')):
-                                      # remove the above comment later, when embeddings are working 
-                                      # with the same metrics as the othe models
+
         import embeddings_DL as Emb
         
         # Find the vocabulary sizes for the categorical features
-        vocabulary_sizes = [df_train[c].nunique() for c in categorical_columns]
+        vocabulary_sizes = [df_concatenated[c].nunique() for c in categorical_columns]
 
         # Maximum sentence length
         max_length=2
 
         embeddings_model = Emb.model_with_embeddings(vocabulary_sizes, max_length, len(ordinal_columns))
-        categorical_data = Emb.data_preprocessing(df_train, categorical_columns, vocabulary_sizes, max_length)
+        categorical_data = Emb.data_preprocessing(df_concatenated, categorical_columns, vocabulary_sizes, max_length)
 
         # normalize the orindal features
-        ordinal_data = [ (normalize_column(df_train[c])).reshape(-1,1) for c in ordinal_columns] 
+        ordinal_data = [ (Process.normalize_column(df_concatenated[c])).reshape(-1,1) for c in ordinal_columns] 
 
         input_data = categorical_data+ordinal_data
-        labels = np.array((pd.get_dummies(df_train['Status'], columns=['Status'])['paid']).tolist())
+        labels = np.array((pd.get_dummies(df_concatenated['Status'], columns=['Status'])['paid']).tolist())
 
-        acc = embeddings_model(input_data,labels)
+        labels_train = labels[:train_length]
+        labels_test = labels[train_length:]
+        input_data_train = []
+        input_data_test = []
+        for i in range(len(input_data)):
+            input_data_train.append(input_data[i][:train_length,:])
+            input_data_test.append(input_data[i][train_length:,:])
 
-        print('Training Accuracy: %f' % (acc*100))
+
+        acc = embeddings_model.train(input_data_train,labels_train)
+        print('Training Accuracy = %f' % (acc*100))
+        acc = embeddings_model.test(input_data_test,labels_test)
+
+        print('Testing Accuracy = %f' % (acc*100))
+
 
     Vis.report_model_performance(y_test,y_pred,y_prob,model_titles)
