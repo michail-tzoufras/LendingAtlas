@@ -1,3 +1,6 @@
+# Developed by: Michail Tzoufras 
+# Date updated: 9/23/2019
+
 import os
 
 import pandas as pd
@@ -158,7 +161,7 @@ def plot_roc_curve(ytest, yprob_list, model_title_list):
     the ground truth ytest. All curves are shown on the same
     plot"""
     
-    Colors = ['DodgerBlue','ForestGreen']
+    Colors = ['DodgerBlue','ForestGreen','Crimson']
 
     fig = plt.figure(figsize=(8,8))
     ax = fig.add_subplot(111)
@@ -178,13 +181,14 @@ def plot_roc_curve(ytest, yprob_list, model_title_list):
 
     fig.savefig('ROC_Curve.png')
 
-def plot_precision_recall(ytest, yhat_list, yprob_list, model_title_list):
+def plot_precision_recall(ytest, yhat_list, 
+    yprob_list, model_title_list):
     """Plots the precision-recall for a list of models
     with the corresponding list of probabilities yprob given
     the ground truth ytest. All curves are shown on the same
     plot."""
     
-    Colors = ['DodgerBlue','ForestGreen']
+    Colors = ['DodgerBlue','ForestGreen','Crimson']
 
     fig = plt.figure(figsize=(8,8))
     ax = fig.add_subplot(111)
@@ -217,3 +221,20 @@ def report_model_performance(ytest, yhat_list, yprob_list, model_title_list):
     plot_confusion_matrix(ytest, yhat_list, model_title_list)
     plot_roc_curve(ytest, yprob_list, model_title_list)
     plot_precision_recall(ytest, yhat_list, yprob_list, model_title_list)
+
+
+def plot_training_history(_hist):
+    fig = plt.figure(figsize=(8,8))
+    plt.subplot(211)
+    plt.title('Loss')
+    plt.plot(_hist.history['loss'], label='train')
+    #plt.plot(history.history['val_loss'], label='test')
+    plt.legend()
+    #plot accuracy during training
+    plt.subplot(212)
+    plt.title('Accuracy')
+    plt.plot(_hist.history['acc'], label='train')
+    #plt.plot(history.history['val_acc'], label='test')
+    plt.legend()
+    plt.subplots_adjust(hspace=0.5)
+    fig.savefig('training_history.png')
