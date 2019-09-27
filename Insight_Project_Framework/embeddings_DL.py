@@ -45,7 +45,7 @@ class model_with_embeddings(object):
         self.merged_model = Model(inputs=embedding_inputs+ordinal_inputs, outputs=output)
 
 
-    def __call__(self, _input_data, _labels, quiet = False):
+    def train(self, _input_data, _labels, quiet = False):
         """compiles the model, fits the _input_data to the _labels, and evaluates the accuracy
         of the merged_model"""
 
@@ -53,7 +53,7 @@ class model_with_embeddings(object):
         (self.merged_model).compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 
         # fit the model
-        (self.merged_model).fit(_input_data, _labels, epochs=2, verbose=0)
+        (self.merged_model).fit(_input_data, _labels, epochs=10, verbose=0)
 
         # evaluate the model
         loss, accuracy = (self.merged_model).evaluate(_input_data, _labels, verbose=0)
@@ -61,6 +61,14 @@ class model_with_embeddings(object):
         if (not quiet):
             plot_model(self.merged_model, to_file='merged_model_plot.png', 
                                         show_shapes=True, show_layer_names=True)
+
+        return accuracy
+
+
+    def test(self, _input_data, _labels, quiet = False):
+
+        # evaluate the model
+        loss, accuracy = (self.merged_model).evaluate(_input_data, _labels, verbose=0)
 
         return accuracy
         
