@@ -52,7 +52,7 @@ def combine_rare(df,column, Limit = 200):
         if (np.sum(df[df[column] ==r]['Status'].value_counts()) < Limit):
             df[column].replace(r,'Rare_'+column,inplace=True)
 
-def oversample_minority(df, ratio = 1.0):
+def oversample_minority(df, ratio = 1.0, random_state=3):
     """Oversamples the minority class to reach a ratio by default
     equal to 1 between the majority and mionority classes"""
     count_class_0, count_class_1 = df['Status'].value_counts()
@@ -60,12 +60,12 @@ def oversample_minority(df, ratio = 1.0):
     df_class_1 = df[df['Status'] == 'defaulted']
     #print(count_class_0)
     #print(count_class_1)
-    df_class_1_over = df_class_1.sample(int(ratio*count_class_0),replace=True)
+    df_class_1_over = df_class_1.sample(int(ratio*count_class_0),replace=True, random_state = random_state)
     df_train_over = pd.concat([df_class_0, df_class_1_over], axis=0)
     #print(df_train_over['Status'].value_counts())
     return df_train_over
 
-def undersample_majority(df, ratio = 1.0):
+def undersample_majority(df, ratio = 1.0, random_state=3):
     """Undersamples the majority class to reach a ratio by default
     equal to 1 between the majority and minority classes"""
     count_class_0, count_class_1 = df['Status'].value_counts()
@@ -73,7 +73,7 @@ def undersample_majority(df, ratio = 1.0):
     df_class_1 = df[df['Status'] == 'defaulted']
     #print(count_class_0)
     #print(count_class_1)
-    df_class_0_under = df_class_0.sample(int(ratio*count_class_1))
+    df_class_0_under = df_class_0.sample(int(ratio*count_class_1), random_state = random_state)
     df_train_under = pd.concat([df_class_0_under, df_class_1], axis=0)
     #print(df_train_under['Status'].value_counts)
     return df_train_under
