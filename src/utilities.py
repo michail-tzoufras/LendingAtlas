@@ -1,8 +1,12 @@
 # Developed by: Michail Tzoufras 
-# Date updated: 9/23/2019
+# Date updated: 9/29/2019
 
 import os
 import csv
+
+import pandas as pd
+import numpy as np
+import copy
 
 #------------------------------------------------------------------
 
@@ -37,6 +41,42 @@ def split(filehandler, output_path, output_name_template, row_limit=100000, deli
 
         output_writer.writerow(row)
         i += 1
+
+def reader(filehandler,  delimiter=','):
+    """Break up the file provided by the filehandler to several csv files
+    of manageable size of row_limit rows. """
+
+    file_reader = csv.reader(filehandler, delimiter=delimiter)
+    file_headers = next(file_reader)
+        
+    loan_id = []
+    partner_id = []
+    
+    for i,row in enumerate(file_reader):
+        if (i > 5):
+            loan_id.append(row[0])
+            partner_id.append(row[19])
+    return loan_id, partner_id
+
+
+def attach_partner_id(file1 = '/Users/mtzoufras/Desktop/Insight/Insight_Project_Data/kiva_ds_csv/loans.csv',
+                      file2 = '/Users/mtzoufras/Desktop/Insight/Insight_Project_Data/BigML_Dataset.csv'):
+
+    loan_ids, partners_ids = reader(open(file1,'r'))
+    df_raw = pd.read_csv(file2)
+    df_raw['Partner ID'] = 'Missing'
+    list_of_ints = [np.int64(l) for l in loan_ids]
+
+    for i,lid in enumerate(list_of_ints):
+        if len(df_raw[df_raw['id'] == lid])>0:
+            ind = df_raw.loc[df_raw['id'] == list_of_ints[i]].index.values[0]
+            df_raw.at[ind,'Partner ID'] = partners_ids[i]
+
+    useful_columns = ['Loan Amount','Country','Sector','Activity','Status','Funded Date.year','Funded Date.month','Partner ID']
+    valid_status = ['paid','defaulted']
+    df_clean = (df_raw[useful_columns][df_raw.Status.isin(valid_status)]).copy()
+    df_clean.to_csv('dfclean.csv',mode = 'w', index=False)
+
 
 def str2bool(v):
     """Allows me to use default bools in argparse"""
