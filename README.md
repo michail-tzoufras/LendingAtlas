@@ -12,6 +12,9 @@ Embeddings can be used to convert categorical data, which are typically represen
 
 ## Running the code:
 
+### Data
+Data originate from <a href="https://www.kiva.org"> kiva.org </a>, which provides micro-loan <a href="https://build.kiva.org/docs/data/snapshots"> data snapshots </a> at its website. However, kiva snapshots no longer include repayment status, only funded/expired information, and this had to be scraped and merged into the kiva dataset. A processed dataset, where loans are either fully paid or defaulted upon, is included under `/data/processed/processed_kiva_data.csv.zip`. This file need to be uncompressed prior to running the code. The original kiva files and the preprocessed versions are omitted. Functions that can be used to generate the processed files starting from the "data snapshots" are available under `/src/utilities.py`.
+
 ### Requisites
 The code was developed on Python 3.7 and requires the following libraries:
 - scikit-learn
@@ -19,15 +22,35 @@ The code was developed on Python 3.7 and requires the following libraries:
 - argparse
 - numpy 
 
-### Data
-Data originate from <a href="https://www.kiva.org"> kiva.org </a>, which provides micro-loan <a href="https://build.kiva.org/docs/data/snapshots"> data snapshots </a> at its website. However, snapshots do not presently include repayment information and this had to be scraped and merged into the kiva dataset. A processed dataset that includes loans with only paid/defaulted status and remains under 50MB is included under `/data/processed`. The original and the preprocessed files are omitted due to their size. Functions that can be used to generate the processed files are available in `/src/utilities.py`.
-
 ### Running the code from the command line
 The code can be run from the command line by calling:
 ```shell
 $ python main.py
 ```
+Two folders will be generated:
+- `output_figs`: Output figures `.png` for this dataset.
+- `output_embeddings`: Embeddings `.csv` for the categorical variables.
 
+The following flags are available:
+>`--data`: The file path to the processed data. This is set by default to `/../data/processed/processed_kiva_data.csv`.
+
+>`--solver='All'` enables one to select between 
+> - Logistic Regression
+> - Random Forest
+> - Embeddings
+> - All
+
+>`--shallow_net 32 8`: A shallow network is used to train the embeddings and the list of positive integers represents the nodes per hidden layer.
+
+>`--deep_net 64 64 64 8`: A neural network that uses the embeddings evaluated by the shallow network. By default this keyword is not present. If it is present it should be followed by the number of nodes per hidden layer.
+
+>`--epochs 50 50`: First network (that evaluates the embeddings) is trained for 50 epochs (first value) and second network (that uses the pretrained embeddings is trained for another 50 epochs (second value). 
+
+>`--batch_size 500 500`: Batch sizes for the first and second networks respectively.
+
+>`--sample="undersample"`: By default if the classes are imbalanced the code undersamples the majority class to achieve 1 to 1 ratio. Alternatively one can set "oversample" or "None" to either oversample the mionority class (to 1 to 1 ratio) or to continue using the imbalanced dataset. 
+
+>`--explore_data`: If this flag is present then a few exploratory plots are generated from the data. 
 
 ## Motivation for this project format:
 - **Insight_Project_Framework** : Put all source code for production within structured directory
