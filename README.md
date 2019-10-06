@@ -32,7 +32,7 @@ Two folders will be generated:
 - `output_embeddings`: Embeddings `.csv` for the categorical variables.
 
 The following flags are available:
->`--data`: The file path to the processed data. This is set by default to `/../data/processed/processed_kiva_data.csv`.
+>`--data`: The file path to the processed data.
 
 >`--solver='All'` enables one to select between 
 > - Logistic Regression
