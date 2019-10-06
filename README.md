@@ -20,7 +20,7 @@ The code was developed on Python 3.7 and requires the following libraries:
 - numpy 
 
 ### Data
-Kiva data
+Data originate from <a href="https://www.kiva.org"> kiva.org </a>, which provides micro-loan <a href="https://build.kiva.org/docs/data/snapshots"> data snapshots </a> at its website. However, snapshots do not presently include repayment information and this had to be scraped and merged into the kiva dataset. A processed dataset that includes loans with only paid/defaulted status and remains under 50MB is included under `/data/processed`. The original and the preprocessed files are omitted due to their size. Functions that can be used to generate the processed files are available in `/src/utilities.py`.
 
 ### Running the code from the command line
 The code can be run from the command line by calling:
