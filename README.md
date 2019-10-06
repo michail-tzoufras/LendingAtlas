@@ -27,11 +27,11 @@ The code can be run from the command line by calling:
 ```shell
 $ python main.py
 ```
-Two folders will be generated:
+Two **output folders** will be generated:
 - `output_figs`: Output figures `.png` for this dataset.
 - `output_embeddings`: Embeddings `.csv` for the categorical variables.
 
-The following flags are available:
+The following **flags** are available:
 
 - `--data`: The file path to the processed data.
 
