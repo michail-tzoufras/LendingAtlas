@@ -32,25 +32,26 @@ Two folders will be generated:
 - `output_embeddings`: Embeddings `.csv` for the categorical variables.
 
 The following flags are available:
->`--data`: The file path to the processed data.
 
->`--solver='All'` enables one to select between 
-> - Logistic Regression
-> - Random Forest
-> - Embeddings
-> - All
+-`--data`: The file path to the processed data.
 
->`--shallow_net 32 8`: A shallow network is used to train the embeddings and the list of positive integers represents the nodes per hidden layer.
+-`--solver='All'` enables one to select between 
+>> -  Logistic Regression
+>> - Random Forest
+>> - Embeddings
+>> -  All
 
->`--deep_net 64 64 64 8`: A neural network that uses the embeddings evaluated by the shallow network. By default this keyword is not present. If it is present it should be followed by the number of nodes per hidden layer.
+- `--shallow_net 32 8`: A shallow network is used to train the embeddings and the list of positive integers represents the nodes per hidden layer.
 
->`--epochs 50 50`: First network (that evaluates the embeddings) is trained for 50 epochs (first value) and second network (that uses the pretrained embeddings is trained for another 50 epochs (second value). 
+- `--deep_net 64 64 64 8`: A neural network that uses the embeddings evaluated by the shallow network. By default this keyword is not present. If it is present it should be followed by the number of nodes per hidden layer.
 
->`--batch_size 500 500`: Batch sizes for the first and second networks respectively.
+- `--epochs 50 50`: First network (that evaluates the embeddings) is trained for 50 epochs (first value) and second network (that uses the pretrained embeddings is trained for another 50 epochs (second value). 
 
->`--sample="undersample"`: By default if the classes are imbalanced the code undersamples the majority class to achieve 1 to 1 ratio. Alternatively one can set "oversample" or "None" to either oversample the mionority class (to 1 to 1 ratio) or to continue using the imbalanced dataset. 
+- `--batch_size 500 500`: Batch sizes for the first and second networks respectively.
 
->`--explore_data`: If this flag is present then a few exploratory plots are generated from the data. 
+- `--sample="undersample"`: By default if the classes are imbalanced the code undersamples the majority class to achieve 1 to 1 ratio. Alternatively one can set "oversample" or "None" to either oversample the mionority class (to 1 to 1 ratio) or to continue using the imbalanced dataset. 
+
+- `--explore_data`: If this flag is present then a few exploratory plots are generated from the data. 
 
 ## Motivation for this project format:
 - **Insight_Project_Framework** : Put all source code for production within structured directory
