@@ -33,13 +33,9 @@ Two folders will be generated:
 
 The following flags are available:
 
--`--data`: The file path to the processed data.
+- `--data`: The file path to the processed data.
 
--`--solver='All'` enables one to select between 
->> -  Logistic Regression
->> - Random Forest
->> - Embeddings
->> -  All
+- `--solver='All'` enables one to select between (1) 'Logistic Regression', (2) 'Random Forest', (3) 'Embeddings', (4) 'All'
 
 - `--shallow_net 32 8`: A shallow network is used to train the embeddings and the list of positive integers represents the nodes per hidden layer.
 
