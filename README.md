@@ -2,11 +2,32 @@
 A platform for assessing risk in micro-lending.
 
 ## Motivation:
-Nearly 70% percent of the world population has no credit history and is ineligible for loans from almost every institution. Yet many companies and individuals would be willing to extend loans if there was a way to assess the risk. Improved understanding implies not just the generation of a somewhat-opaque score but explaining in a transparent manner factors that contribute to reducing the risk of default. Such a comprehensive picture a would facilitate significant increase in lending and result in mutual benefit for lenders and borrowers.
+Nearly 70% percent of the world population has no credit history and is ineligible for loans from almost every institution. Yet many companies and individuals would be willing to extend loans if there was a way to assess the risk. Improved understanding implies not just the generation of a somewhat-opaque score but explaining in a transparent manner the factors that contribute to reducing the risk of default. Such a comprehensive picture a would facilitate significant increase in lending and result in mutual benefit for lenders and borrowers.
 
-The standard approach to employing data in assessing creditworthiness is to tabulate the available categorical data available --data such as geographic location, gender, sector etc.--and run logistic regression or random forest to produce a probability of default, namely a credit score. Regardless of how accurate the resulting credit score may be, these methods fail to produce the understanding that would enable companies to expand their activities and individuals to confidently extend micro-loans. An approach suitable for generating insights to accompany the score prediction would be a bolster micro-fianance.    
+When employing data to assess creditworthiness, the standard approach is to tabulate the available categorical information  &mdash; geographic location, gender, sector etc.  &mdash; and run logistic regression or random forest to produce a probability of default, i.e. a credit score. The resulting credit score, however accurate it may be, is not sufficient enable companies to expand their activities and individuals to confidently extend micro-loans. An alternative approach ought to yield insights that go beyond a single numerical value.
 
 ## Approach:
+
+Embeddings can be used to convert categorical data, which are typically represented using orthogonal unit-vectors in a high-dimensional space (one-hot vectors), to real-valued vectors in just a few dimensions. The resulting low-dimensional real-valued vectors may then be used (1) as inputs to a Multi-Layer Perceptron or some other classification algorithm, or (2) to explore relationships in the data. The aforementioned Embeddings are weight matrices that can be used to convert the categorical data to real-valued vectors. They are calculated by training a neural network on a supervised task.
+
+## Running the code:
+
+### Requisites
+The code was developed on Python 3.7 and requires the following libraries:
+- scikit-learn
+- keras
+- argparse
+- numpy 
+
+### Data
+Kiva data
+
+### Running the code from the command line
+The code can be run from the command line by calling:
+```shell
+$ python main.py
+```
+
 
 ## Motivation for this project format:
 - **Insight_Project_Framework** : Put all source code for production within structured directory
