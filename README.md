@@ -1,5 +1,12 @@
-# Insight_Project_Framework
-Framework for machine learning projects at Insight Data Science.
+# LendingAtlas
+A platform for assessing risk in micro-lending.
+
+## Motivation:
+Nearly 70% percent of the world population has no credit history and is ineligible for loans from almost every institution. Yet many companies and individuals would be willing to extend loans if there was a way to assess the risk. Improved understanding implies not just the generation of a somewhat-opaque score but explaining in a transparent manner factors that contribute to reducing the risk of default. Such a comprehensive picture a would facilitate significant increase in lending and result in mutual benefit for lenders and borrowers.
+
+The standard approach to employing data in assessing creditworthiness is to tabulate the available categorical data available --data such as geographic location, gender, sector etc.--and run logistic regression or random forest to produce a probability of default, namely a credit score. Regardless of how accurate the resulting credit score may be, these methods fail to produce the understanding that would enable companies to expand their activities and individuals to confidently extend micro-loans. An approach suitable for generating insights to accompany the score prediction would be a bolster micro-fianance.    
+
+## Approach:
 
 ## Motivation for this project format:
 - **Insight_Project_Framework** : Put all source code for production within structured directory
