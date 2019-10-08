@@ -10,17 +10,17 @@ When employing data to assess creditworthiness, the standard approach is to tabu
 
 Embeddings can be used to convert categorical data, which are typically represented using orthogonal unit-vectors in a high-dimensional space (one-hot vectors), to real-valued vectors in just a few dimensions. The resulting low-dimensional real-valued vectors may then be used (1) as inputs to a Multi-Layer Perceptron or some other classification algorithm, or (2) to explore relationships in the data. The aforementioned Embeddings are weight matrices that can be used to convert the categorical data to real-valued vectors. They are calculated by training a neural network on a supervised task.
 
-## Running the code:
-
-### Data
+## Data
 Data originate from <a href="https://www.kiva.org"> kiva.org </a>, which provides micro-loan <a href="https://build.kiva.org/docs/data/snapshots"> data snapshots </a> at its website. However, kiva snapshots no longer include repayment status, only funded/expired information, and this had to be scraped and merged into the kiva dataset. A processed dataset, where loans are either fully paid or defaulted upon, is included under `/data/processed/processed_kiva_data.csv.zip`. This file need to be uncompressed prior to running the code. The original kiva files and the preprocessed versions are omitted. Functions that can be used to generate the processed files starting from the "data snapshots" are available under `/src/utilities.py`.
 
-### Requisites
+## Requisites
 The code was developed on Python 3.7 and requires the following libraries:
 - scikit-learn
 - keras
 - argparse
 - numpy 
+
+## Running the code:
 
 ### Running the code from the command line
 The code can be run from the command line by calling:
