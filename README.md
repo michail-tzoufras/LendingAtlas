@@ -20,6 +20,11 @@ The code was developed on Python 3.7 and requires the following libraries:
 - argparse
 - numpy 
 
+You can recreate the environment and install its package dependencies using
+```shell
+$ conda env create -f build/LendingAtlas_env.yml
+```
+
 ## Running the code
 
 ### Command line interface
