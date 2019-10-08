@@ -1,12 +1,12 @@
 # LendingAtlas
 A platform for assessing risk in micro-lending.
 
-## Motivation:
+## Motivation
 Nearly 70% percent of the world population has no credit history and is ineligible for loans from almost every institution. Yet many companies and individuals would be willing to extend loans if there was a way to assess the risk. Improved understanding implies not just the generation of a somewhat-opaque score but explaining in a transparent manner the factors that contribute to reducing the risk of default. Such a comprehensive picture a would facilitate significant increase in lending and result in mutual benefit for lenders and borrowers.
 
 When employing data to assess creditworthiness, the standard approach is to tabulate the available categorical information  &mdash; geographic location, gender, sector etc.  &mdash; and run logistic regression or random forest to produce a probability of default, i.e. a credit score. The resulting credit score, however accurate it may be, is not sufficient enable companies to expand their activities and individuals to confidently extend micro-loans. An alternative approach ought to yield insights that go beyond a single numerical value.
 
-## Approach:
+## Approach
 
 Embeddings can be used to convert categorical data, which are typically represented using orthogonal unit-vectors in a high-dimensional space (one-hot vectors), to real-valued vectors in just a few dimensions. The resulting low-dimensional real-valued vectors may then be used (1) as inputs to a Multi-Layer Perceptron or some other classification algorithm, or (2) to explore relationships in the data. The aforementioned Embeddings are weight matrices that can be used to convert the categorical data to real-valued vectors. They are calculated by training a neural network on a supervised task.
 
