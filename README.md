@@ -20,9 +20,9 @@ The code was developed on Python 3.7 and requires the following libraries:
 - argparse
 - numpy 
 
-## Running the code:
+## Running the code
 
-### Running the code from the command line
+### Command line interface
 The code can be run from the command line by calling:
 ```shell
 $ python main.py
