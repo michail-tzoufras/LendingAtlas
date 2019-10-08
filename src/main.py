@@ -5,6 +5,7 @@ import os
 import csv
 import argparse
 import sys
+import zipfile
 
 import pandas as pd
 import numpy as np
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data",
         action="store",
-        default=os.getcwd() + "/../data/processed/processed_kiva_data.csv",
+        default=os.getcwd() + '/../data/processed/processed_kiva_data.csv.zip',
         help="dataset path",
     )
     parser.add_argument(
@@ -89,7 +90,8 @@ if __name__ == "__main__":
 
     # Utils.split(open(args.data, 'r'), datapath, dataname)
 
-    df_raw = pd.read_csv(args.data)
+    zf = zipfile.ZipFile(args.data)
+    df_raw = pd.read_csv(zf.open('processed_kiva_data.csv'))
 
     df_raw["Country Currency"] = "Empty"
     for i in range(len(df_raw)):
