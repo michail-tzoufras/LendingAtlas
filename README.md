@@ -2,9 +2,9 @@
 A platform for assessing risk in micro-lending. Please find the slides associated with this project [here](https://drive.google.com/open?id=1ejxnE_gvRhf6n6RGqNMrEHwo2j7aHA5CkmFvz4YNKso).
 
 ## Motivation
-Nearly 70% percent of the world population has no credit history and is ineligible for loans from almost every institution. Yet many companies and individuals would be willing to extend loans if there was a way to assess the risk. And although a&mdash;somewhat-opaquely-calculated&mdash;credit score can be derived from the available data it is not suitable for identifying and explaining the underlying factors. A comprehensive picture of the risk profile would facilitate significant increase in lending and benefit both the lenders and borrowers.
+Nearly 70% percent of the world population has no credit history and is ineligible for loans from almost every institution. Yet many companies and individuals would be inclined to extend loans if there was a way to assess the risk. And although a&mdash;somewhat-opaquely-calculated&mdash;credit score can be derived from the available data it is not suitable for identifying and explaining the underlying factors. A comprehensive picture of the risk profile would facilitate significant increase in lending to the benefit of both lenders and borrowers.
 
-When employing data to assess creditworthiness, the standard approach is to tabulate the available categorical information (geographic location, gender, sector etc.) and run logistic regression or random forest to produce a probability of default, i.e. a credit score. An alternative approach should provide insights that go beyond a single numerical value.
+When employing data to assess creditworthiness, the standard approach is to tabulate the categorical information (geographic location, activity, sector etc.) and run logistic regression or random forest on thousands of orthogonal features to produce a probability of default, i.e. a credit score. An alternative approach should provide insights that go beyond a single numerical value.
 
 ## Approach
 
@@ -32,11 +32,8 @@ The code can be run from the command line by calling:
 ```shell
 $ python main.py
 ```
-Two **output folders** will be generated:
-- `output_figs`: Output figures `.png` for this dataset.
-- `output_embeddings`: Embeddings `.csv` for the categorical variables.
 
-The following **flags** are available:
+#### Flags 
 
 - `--data`: The file path to the processed data.
 
@@ -46,13 +43,18 @@ The following **flags** are available:
 
 - `--deep_net 64 64 64 8`: A neural network that uses the embeddings evaluated by the shallow network. By default this keyword is not present. If it is present it should be followed by the number of nodes per hidden layer.
 
-- `--epochs 50 50`: First network (that evaluates the embeddings) is trained for 50 epochs (first value) and second network (that uses the pretrained embeddings is trained for another 50 epochs (second value). 
+- `--epochs 50 50`: The first network (that evaluates the embeddings) is trained for 50 epochs (first value) and the second network (that uses the pretrained embeddings is trained for another 50 epochs (second value). 
 
-- `--batch_size 500 500`: Batch sizes for the first and second networks respectively.
+- `--batch_size 500 500`: Batch sizes for the first and second network respectively.
 
 - `--sample="undersample"`: By default if the classes are imbalanced the code undersamples the majority class to achieve 1 to 1 ratio. Alternatively one can set "oversample" or "None" to either oversample the mionority class (to 1 to 1 ratio) or to continue using the imbalanced dataset. 
 
 - `--explore_data`: If this flag is present then a few exploratory plots are generated from the data. 
+
+#### Output folders
+Two output folders will be generated:
+- `output_figs`: Output figures `.png` for this dataset.
+- `output_embeddings`: Embeddings `.csv` for the categorical variables.
 
 ### Example
 Run the code with:
@@ -61,14 +63,14 @@ $ python main.py --epochs 50 50 --batch_size 500 500 --shallow_net 32 8 --deep_n
 ```
 The code will report precision, recall, and f1-score for all 4 models. More detailed metrics are reported in the `output_figs` directory where the confusion matrices for all 4 models along with the ROC curve and the Precision-Recall curve are plotted.
 
-In `output_figs` the code will also show the T-distributed Stochastic Network Embedding (t-SNE) for each of the default embeddings. The color coding corresponds to the probability of default. The "Partner ID" is particularly prone to clustering between partners with high probability of default and those with low. The "Town" feature is also shown for a few selected countries. Below, towns in Guatemala are shown on a background of other towns (towns with more than 200 loans) in the dataset.
+In `output_figs` the code will also show the T-distributed Stochastic Network Embedding (t-SNE) for each of the default embeddings. The color coding corresponds to the probability of default. The "Partner ID" is particularly prone to clustering between partners with high probability of default and those with low (image below). The "Town" feature is also shown for a few selected countries. Below, towns in Guatemala are shown on a background of other towns (towns with more than 200 loans) in the dataset.
 
 <p float="left">
   <img src="https://github.com/michail-tzoufras/LendingAtlas/blob/master/example_output/Partner%20ID_embedding_plot.png" width="400" />
   <img src="https://github.com/michail-tzoufras/LendingAtlas/blob/master/example_output/Guatemala_embedding_plot.png" width="400" /> 
 </p>
 
-Finally, the cosine similarity (most similar and most dissimilar) is shown for the "Lebanese LBP" (of the "Country Currency" feature).
+Finally, the cosine similarity (most similar and most dissimilar) is shown for the "Lebanese LBP".
 
 <p align="center">
   <img src="https://github.com/michail-tzoufras/LendingAtlas/blob/master/example_output/LebanesePound.png" 
