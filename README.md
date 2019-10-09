@@ -9,6 +9,10 @@ When employing data to assess creditworthiness, the standard approach is to tabu
 ## Approach
 
 Weight matrices (Embeddings) can be used to convert categorical data, which are typically represented using orthogonal unit-vectors in a high-dimensional space (one-hot vectors), to real-valued vectors in just a few dimensions. The process involves training a neural network on a supervised task and extracting the weights of the matrices that connect the categorical features to the network. The Embeddings yield low-dimensional real-valued vectors to be used (1) as inputs to a Multi Layer Perceptron or some other classification algorithm, or (2) to explore relationships in the data. 
+<p align="center">
+  <img src="https://github.com/michail-tzoufras/LendingAtlas/blob/master/additinal_images/embeddings_image.png" 
+       width="900" />
+</p>
 
 ## Data
 Data originate from <a href="https://www.kiva.org"> kiva.org </a>, which provides micro-loan <a href="https://build.kiva.org/docs/data/snapshots"> data snapshots </a> at its website. However, kiva snapshots no longer include repayment status and this had to be scraped and merged into the dataset. A processed dataset, where loans are either fully repaid or defaulted, is included under `/data/processed/processed_kiva_data.csv.zip`. The original kiva files and the preprocessed versions are omitted. Functions that can be used to generate the processed files starting from the "data snapshots" are available under `/src/utilities.py`.
@@ -76,3 +80,4 @@ Finally, the cosine similarity (most similar and most dissimilar) is shown for t
   <img src="https://github.com/michail-tzoufras/LendingAtlas/blob/master/example_output/LebanesePound.png" 
        width="500" />
 </p>
+
