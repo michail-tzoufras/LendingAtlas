@@ -68,7 +68,7 @@ In `output_figs` the code will also show the T-distributed Stochastic Network Em
   <img src="https://github.com/michail-tzoufras/LendingAtlas/blob/master/example_output/Guatemala_embedding_plot.png" width="400" /> 
 </p>
 
-Finally, the cosine similarity is shown between the "Lebanese LBP" of the "Country Currency" feature for the most similar (as well as most dissimilar) values.
+Finally, the cosine similarity (most similar and most dissimilar) is shown for the "Lebanese LBP" (of the "Country Currency" feature).
 
 <p align="center">
   <img src="https://github.com/michail-tzoufras/LendingAtlas/blob/master/example_output/LebanesePound.png" 
