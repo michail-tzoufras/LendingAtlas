@@ -47,7 +47,7 @@ $ python main.py
 
 - `--deep_net 64 64 64 8`: A neural network that uses the embeddings evaluated by the shallow network. By default this keyword is not present. If it is present it should be followed by the number of nodes per hidden layer.
 
-- `--epochs 50 50`: The first network (that evaluates the embeddings) is trained for 50 epochs (first value) and the second network (that uses the pretrained embeddings is trained for another 50 epochs (second value). 
+- `--epochs 50 50`: Number of epochs for the first (shallow) and second (deep) network respectively.
 
 - `--batch_size 500 500`: Batch sizes for the first and second network respectively.
 
